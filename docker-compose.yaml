@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  oracle-db:
+    build:
+      context: ./oracledb-19.3.0
+      dockerfile: Dockerfile
+      args:
+        - DB_EDITION=ee # only 19c ee is supported on arm64
+    environment:
+      - ORACLE_SID=ORACLEDB
+      - ORACLE_PDB=ORACLEPDB1
+      - ORACLE_PWD=123456789@
+      - ORACLE_EDITION=enterprise
+    ports:
+      - 1521:1521
+      - 5500:5500
+      - 2484:2484
+    volumes:
+      - oradata:/opt/oracle/oradata
+
+volumes:
+  oradata:

@@ -7,6 +7,7 @@ services:
       dockerfile: Dockerfile
       args:
         - DB_EDITION=ee # only 19c ee is supported on arm64
+        - INSTALL_FILE_1=LINUX.ARM64_1919000_db_home.zip
     environment:
       - ORACLE_SID=ORACLEDB
       - ORACLE_PDB=ORACLEPDB1

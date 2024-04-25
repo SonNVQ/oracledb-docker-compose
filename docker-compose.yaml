@@ -8,11 +8,14 @@ services:
       args:
         - DB_EDITION=ee # only 19c ee is supported on arm64
         - INSTALL_FILE_1=LINUX.ARM64_1919000_db_home.zip
+        - BASE_IMAGE=amd64/oraclelinux:7
+        - SLIMMING=false
     environment:
       - ORACLE_SID=ORACLEDB
       - ORACLE_PDB=ORACLEPDB1
       - ORACLE_PWD=123456789@
       - ORACLE_EDITION=enterprise
+      - CV_ASSUME_DISTID=OEL8
     ports:
       - 1521:1521
       - 5500:5500

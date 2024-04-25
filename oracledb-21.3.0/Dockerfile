@@ -4,25 +4,23 @@
 #
 # ORACLE DOCKERFILES PROJECT
 # --------------------------
-# This is the Dockerfile for Oracle Database 19c
+# This is the Dockerfile for Oracle Database 21c
 # 
 # REQUIRED FILES TO BUILD THIS IMAGE
 # ----------------------------------
-# (1) db_home.zip
-#     Download Oracle Database 19c Enterprise Edition or Standard Edition 2 for Linux x64
+# (1) LINUX.X64_213000_db_home.zip
+#     Download Oracle Database 21c Enterprise Edition or Standard Edition 2 for Linux x64
 #     from http://www.oracle.com/technetwork/database/enterprise-edition/downloads/index.html
 #
 # HOW TO BUILD THIS IMAGE
 # -----------------------
 # Put all downloaded files in the same directory as this Dockerfile
 # Run: 
-#      $ docker build -t oracle/database:19.3.0-${EDITION} . 
+#      $ docker build -t oracle/database:21.3.0-${EDITION} .
 #
 # Pull base image
 # ---------------
-ARG BASE_IMAGE=oraclelinux:7-slim
-# hadolint ignore=DL3006
-FROM ${BASE_IMAGE} as base
+FROM oraclelinux:7-slim as base
 
 # Labels
 # ------
@@ -38,12 +36,13 @@ LABEL "provider"="Oracle"                                               \
 
 # Argument to control removal of components not needed after db software installation
 ARG SLIMMING=true
-ARG INSTALL_FILE_1="LINUX.X64_193000_db_home.zip"
+ARG INSTALL_FILE_1="LINUX.X64_213000_db_home.zip"
 
 # Environment variables required for this build (do NOT change)
 # -------------------------------------------------------------
 ENV ORACLE_BASE=/opt/oracle \
-    ORACLE_HOME=/opt/oracle/product/19c/dbhome_1 \
+    ORACLE_HOME=/opt/oracle/product/21c/dbhome_1 \
+    ORACLE_BASE_HOME=/opt/oracle/homes/OraDB21Home1 \
     INSTALL_DIR=/opt/install \
     INSTALL_FILE_1=$INSTALL_FILE_1 \
     INSTALL_RSP="db_inst.rsp" \
@@ -109,9 +108,9 @@ COPY --chown=oracle:dba $INSTALL_FILE_1 $INSTALL_RSP $INSTALL_DB_BINARIES_FILE $
 
 # Install DB software binaries
 USER oracle
-RUN chmod ug+x "$INSTALL_DIR"/*.sh && \
+RUN chmod ug+x $INSTALL_DIR/*.sh && \
     sync && \
-    "$INSTALL_DIR"/"$INSTALL_DB_BINARIES_FILE" $DB_EDITION
+    $INSTALL_DIR/$INSTALL_DB_BINARIES_FILE $DB_EDITION
 
 
 
@@ -127,18 +126,17 @@ USER oracle
 COPY --chown=oracle:dba --from=builder $ORACLE_BASE $ORACLE_BASE
 
 USER root
-RUN "$ORACLE_BASE"/oraInventory/orainstRoot.sh && \
-    "$ORACLE_HOME"/root.sh
+RUN $ORACLE_BASE/oraInventory/orainstRoot.sh && \
+    $ORACLE_HOME/root.sh
 
 USER oracle
 WORKDIR /home/oracle
 
 # Add a bashrc file to capitalize ORACLE_SID in the environment
-# hadolint ignore=SC2016
 RUN echo 'ORACLE_SID=${ORACLE_SID:-ORCLCDB}; export ORACLE_SID=${ORACLE_SID^^}' > .bashrc
 
 HEALTHCHECK --interval=1m --start-period=5m --timeout=30s \
    CMD "$ORACLE_BASE/$CHECK_DB_FILE" >/dev/null || exit 1
 
 # Define default command to start Oracle Database. 
-CMD [ "/bin/bash", "-c", "exec $ORACLE_BASE/$RUN_FILE" ]
+CMD exec $ORACLE_BASE/$RUN_FILE

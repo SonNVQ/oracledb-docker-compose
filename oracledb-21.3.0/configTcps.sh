@@ -95,7 +95,7 @@ SSL_CLIENT_AUTHENTICATION = FALSE" | tee -a "$ORACLE_BASE"/oradata/dbconfig/"$OR
 
    # Disable OOB in sqlnet.ora of DB wallet
    echo "DISABLE_OOB=ON" >> "$ORACLE_BASE"/oradata/dbconfig/"$ORACLE_SID"/sqlnet.ora
-   
+
    # Add listener for TCPS
    sed -i "/TCP/a\
 \ \ \ \ (ADDRESS = (PROTOCOL = TCPS)(HOST = 0.0.0.0)(PORT = ${TCPS_PORT}))
@@ -108,7 +108,7 @@ function reconfigure_listener() {
   lsnrctl stop
   lsnrctl start
 
-  # To quickly register a service
+# To quickly register a service
   echo 'alter system register;' | sqlplus -s / as sysdba
 }
 
@@ -133,7 +133,11 @@ export ORACLE_SID
 ORACLE_SID="$(grep "$ORACLE_HOME" /etc/oratab | cut -d: -f1)"
 
 # Export ORACLE_PDB value
-export ORACLE_PDB=${ORACLE_PDB:-ORCLPDB1}
+if [ "$ORACLE_SID" == "XE" ]; then
+  export ORACLE_PDB="XEPDB1"
+else
+  export ORACLE_PDB=${ORACLE_PDB:-ORCLPDB1}
+fi
 ORACLE_PDB=${ORACLE_PDB^^}
 
 
@@ -153,18 +157,18 @@ if [[ -z "${TCPS_CERTS_LOCATION}" ]]; then
 else
   CUSTOM_CERTS=true
 
-   # Client Cert location (from user)
+  # Client Cert location (from user)
   CLIENT_CERT_LOCATION="${TCPS_CERTS_LOCATION}"/cert.crt # certificate file
 
-   # Intermediate Cert location (Extracted from user provided chained certificate)
+  # Intermediate Cert location (Extracted from user provided chained certificate)
   INTERMEDIATE_CERT_LOCATION="/tmp/cert_temp.crt" # certificate file
 
-   # Client key location
+  # Client key location
   CLIENT_KEY_LOCATION="${TCPS_CERTS_LOCATION}"/client.key # client key
 
-   # Extracting intermediate certificate from user given chain certificate file
-   # Removing the first occurence of following  pattern
-   sed '{0,/-END CERTIFICATE-/d}' "$CLIENT_CERT_LOCATION" > "$INTERMEDIATE_CERT_LOCATION" 
+  # Extracting intermediate certificate from user given chain certificate file
+  # Removing the first occurence of following  pattern
+  sed '{0,/-END CERTIFICATE-/d}' "$CLIENT_CERT_LOCATION" > "$INTERMEDIATE_CERT_LOCATION" 
 fi
 
 # Disable TCPS control flow

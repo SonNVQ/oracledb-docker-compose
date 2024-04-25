@@ -10,10 +10,15 @@
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 # 
 
-REQUIRED_SPACE_GB=18
+# CONF_FILE env var is set only for XE Database
+if [ "${ORACLE_SID}" = "XE" ]; then
+  REQUIRED_SPACE_GB=13
+else
+  REQUIRED_SPACE_GB=21
+fi
 AVAILABLE_SPACE_GB=$(df -PB 1G / | tail -n 1 | awk '{ print $4 }')
 
-if [ "$AVAILABLE_SPACE_GB" -lt "$REQUIRED_SPACE_GB" ]; then
+if [ "$AVAILABLE_SPACE_GB" -lt $REQUIRED_SPACE_GB ]; then
   script_name=$(basename "$0")
   echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
   echo "$script_name: ERROR - There is not enough space available in the container."

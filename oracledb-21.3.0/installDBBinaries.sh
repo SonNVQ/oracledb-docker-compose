@@ -21,7 +21,7 @@ if [ "$EDITION" == "" ]; then
 fi;
 
 # Check whether correct edition has been passed on
-if [ "$EDITION" != "EE" -a "$EDITION" != "SE2" ]; then
+if [ "$EDITION" != "EE" ] && [ "$EDITION" != "SE2" ]; then
    echo "ERROR: Wrong edition has been passed on!"
    echo "Edition $EDITION is no a valid edition!"
    exit 1;

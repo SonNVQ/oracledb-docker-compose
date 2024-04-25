@@ -3,30 +3,23 @@ version: "3.8"
 services:
   oracle-db:
     build:
-      context: ./oracledb-19.3.0
+      context: ./oracledb-21.3.0
       dockerfile: Dockerfile
       args:
-        - DB_EDITION=ee # only 19c ee is supported on arm64
-        - INSTALL_FILE_1=LINUX.ARM64_1919000_db_home.zip
-        - BASE_IMAGE=arm64v8/oraclelinux:8
+        - DB_EDITION=se2
+        - BASE_IMAGE=oraclelinux:8
         - SLIMMING=false
     environment:
       - ORACLE_SID=ORACLEDB
       - ORACLE_PDB=ORACLEPDB1
-      - ORACLE_PWD=123456789@
-      - ORACLE_EDITION=enterprise
-      - CV_ASSUME_DISTID=OEL8
+      - ORACLE_PWD=123456789a
+      - ORACLE_EDITION=standard
     ports:
       - 1521:1521
       - 5500:5500
       - 2484:2484
     volumes:
       - oradata:/opt/oracle/oradata
-    ulimits:
-      nofile:
-        soft: 65536
-        hard: 65536
-    platform: linux/arm64/v8
 
 volumes:
   oradata:

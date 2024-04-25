@@ -3,7 +3,7 @@
 #
 # Copyright (c) 1982-2022 Oracle and/or its affiliates. All rights reserved.
 # 
-# Since: January, 2022
+# Since: April, 2021
 # Author: abhishek.by.kumar@oracle.com
 # Description: Creates Data Guard Observer using the following parameters:
 #              $DG_OBSERVER_NAME: Name of the observer
@@ -38,3 +38,4 @@ EOF
 
 # Sleep for dgmgrl to start observer in background otherwise container will exit
 sleep 4
+
